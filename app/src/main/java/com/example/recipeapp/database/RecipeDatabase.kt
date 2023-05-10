@@ -18,7 +18,7 @@ abstract class RecipeDatabase:RoomDatabase() {
         //为了避免有多个程序同时调用recipesDatabase对象所以加上了@Synchronized同步锁，同一时间只能有一个线程可以访问该方法
         @Synchronized
         fun getDatabase(context: Context): RecipeDatabase{//返回RecipeDatabase实例
-            if (recipesDatabase == null){
+            if (recipesDatabase == null){//如果数据库为空则创建数据库
                 recipesDatabase = Room.databaseBuilder(
                     context,//上下文对象
                     RecipeDatabase::class.java,//数据库抽象类

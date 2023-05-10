@@ -5,12 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.io.Serializable
 
-
+//数据库菜品表
 @Entity(tableName = "Recipes")
 data class Recipes(
     @PrimaryKey(autoGenerate = true)//插入新数据时，自动生成唯一主键值
-    var id:Int,
+    var id:Int,//菜ID
 
     @ColumnInfo(name = "dishName")//列名为 dishName
-    var dishName:String
+    var dishName:String//菜名
 ) : Serializable//序列化

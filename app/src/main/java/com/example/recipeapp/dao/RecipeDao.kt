@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.recipeapp.entities.Recipes
 
+//数据库操作
 @Dao
 interface RecipeDao {
     //get关键字用于在属性上使用注解,Query是Room数据库框架提供的注解，由于该注解是用于属性而不是方法，因此需要使用@get来指示该注解是用于属性的
