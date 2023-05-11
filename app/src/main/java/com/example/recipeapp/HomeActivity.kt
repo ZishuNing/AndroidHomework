@@ -7,6 +7,7 @@ import com.example.recipeapp.adapter.MainCategoryAdapter
 import com.example.recipeapp.adapter.SubCategoryAdapter
 import com.example.recipeapp.entities.Recipes
 
+//主界面
 class HomeActivity : BaseActivity() {
 
     //主次菜单菜品数据

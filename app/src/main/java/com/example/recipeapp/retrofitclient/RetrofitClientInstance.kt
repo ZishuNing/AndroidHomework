@@ -3,6 +3,7 @@ package com.example.recipeapp.retrofitclient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+//单例类
 class RetrofitClientInstance {
     companion object{
         //数据来自https://www.themealdb.com/

@@ -12,6 +12,7 @@ import com.example.recipeapp.entities.converter.CategoryListConverter
 //"exportSchema = false"指不导出数据库JSON结构文件
 @Database(entities = [Recipes::class,CategoryItems::class,Category::class],version=1, exportSchema = false)
 abstract class RecipeDatabase:RoomDatabase() {
+    // 声明需要使用CategoryListConverter进行类型转换，即在存储时，把List<CategoryItems>转换成JSON
     @TypeConverters(CategoryListConverter::class)
     //单例环境，避免创建多个数据库实例
     companion object{
@@ -23,7 +24,7 @@ abstract class RecipeDatabase:RoomDatabase() {
         fun getDatabase(context: Context): RecipeDatabase{//返回RecipeDatabase实例
             if (recipesDatabase == null){//如果数据库为空则创建数据库
                 recipesDatabase = Room.databaseBuilder(
-                    context,//上下文对象
+                    context,
                     RecipeDatabase::class.java,//数据库抽象类
                     "recipe.db"//数据库名称
                 ).build()

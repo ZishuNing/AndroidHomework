@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import java.io.Serializable
 
 //数据库菜品表
+//Kotlin可以用data class关键字来声明一个数据类，用于封装数据
 @Entity(tableName = "Recipes")
 data class Recipes(
     @PrimaryKey(autoGenerate = true)//插入新数据时，自动生成唯一主键值

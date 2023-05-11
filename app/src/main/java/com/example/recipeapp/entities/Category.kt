@@ -16,6 +16,6 @@ data class Category(
     @ColumnInfo(name = "categoryItems")
     @Expose
     @SerializedName("categories")
-    @TypeConverters(CategoryListConverter::class)
-    var categorieitems: List<CategoryItems>? = null
+    @TypeConverters(CategoryListConverter::class)// 声明需要使用CategoryListConverter进行类型转换，即在拿出来时，从JSON还原为List<CategoryItems>
+    var categorieitems: List<CategoryItems>? = null// 包含CategoryItems的列表
 )
