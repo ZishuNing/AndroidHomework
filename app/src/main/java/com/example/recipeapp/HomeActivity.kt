@@ -1,15 +1,13 @@
 package com.example.recipeapp
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.constraintlayout.widget.ConstraintSet.Layout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipeapp.adapter.MainCategoryAdapter
 import com.example.recipeapp.adapter.SubCategoryAdapter
 import com.example.recipeapp.entities.Recipes
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity() {
 
     //主次菜单菜品数据
     var arrMainCategory = ArrayList<Recipes>()

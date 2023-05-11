@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.example.recipeapp.dao.RecipeDao
 import com.example.recipeapp.entities.*
+import com.example.recipeapp.entities.converter.CategoryListConverter
 
 //"exportSchema = false"指不导出数据库JSON结构文件
-@Database(entities = [Recipes::class],version=1, exportSchema = false)
+@Database(entities = [Recipes::class,CategoryItems::class,Category::class],version=1, exportSchema = false)
 abstract class RecipeDatabase:RoomDatabase() {
+    @TypeConverters(CategoryListConverter::class)
     //单例环境，避免创建多个数据库实例
     companion object{
         //?为可空类型修饰符，表示 recipesDatabase 可以为 null。
