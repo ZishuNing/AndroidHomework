@@ -1,18 +1,26 @@
 package com.example.recipeapp
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipeapp.adapter.MainCategoryAdapter
 import com.example.recipeapp.adapter.SubCategoryAdapter
+import com.example.recipeapp.database.RecipeDatabase
+import com.example.recipeapp.entities.Category
+import com.example.recipeapp.entities.CategoryItems
+import com.example.recipeapp.entities.MealsItems
 import com.example.recipeapp.entities.Recipes
+import kotlinx.coroutines.launch
 
 //主界面
 class HomeActivity : BaseActivity() {
 
     //主次菜单菜品数据
-    var arrMainCategory = ArrayList<Recipes>()
-    var arrSubCategory = ArrayList<Recipes>()
+    var arrMainCategory = ArrayList<CategoryItems>()
+    var arrSubCategory = ArrayList<MealsItems>()
+
     //主次菜单RecyclerView的Adapter
     var mainCategoryAdapter = MainCategoryAdapter()
     var subCategoryAdapter = SubCategoryAdapter()
@@ -21,25 +29,68 @@ class HomeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        // 给主次菜单添加数据（暂时这么写）
-        arrMainCategory.add(Recipes(id = 1, dishName = "Beef"))
-        arrMainCategory.add(Recipes(id = 2, dishName = "Chicken"))
-        arrMainCategory.add(Recipes(id = 3, dishName = "Dessert"))
-        arrMainCategory.add(Recipes(id = 4, dishName = "Lamb"))
-        mainCategoryAdapter.setData(arrMainCategory)
 
-        arrSubCategory.add(Recipes(id = 1, dishName = "Beef and mustard pie"))
-        arrSubCategory.add(Recipes(id = 2, dishName = "Chicken and mushroom hotpot"))
-        arrSubCategory.add(Recipes(id = 3, dishName = "Banana pancakes"))
-        arrSubCategory.add(Recipes(id = 4, dishName = "Kapsalon"))
-        subCategoryAdapter.setData(arrSubCategory)
-        //配置主次菜单RecyclerView
-        val rvMainCategory = findViewById<RecyclerView>(R.id.rv_main_category)
-        rvMainCategory.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)//HORIZONTAL表示子项将水平排列，false表示从左向右排列
-        rvMainCategory.adapter = mainCategoryAdapter
+        getDataFromDb()
 
-        val rvSubCategory = findViewById<RecyclerView>(R.id.rv_sub_category)
-        rvSubCategory.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)//HORIZONTAL表示子项将水平排列，false表示从左向右排列
-        rvSubCategory.adapter = subCategoryAdapter
+        mainCategoryAdapter.setClickListener(onCLicked)
+//        subCategoryAdapter.setClickListener(onCLickedSubItem)
+
+    }
+
+    // 函数指针，点击之后执行onClicked函数
+    private val onCLicked  = object : MainCategoryAdapter.OnItemClickListener{
+        override fun onClicked(categoryName: String) {
+            getMealDataFromDb(categoryName)
+        }
+    }
+
+    //  函数指针，点击之后执行onClicked函数
+//    private val onCLickedSubItem  = object : SubCategoryAdapter.OnItemClickListener{
+//        override fun onClicked(id: String) {
+//            var intent = Intent(this@HomeActivity,DetailActivity::class.java)
+//            intent.putExtra("id",id)
+//            startActivity(intent)
+//        }
+//    }
+
+
+
+
+
+
+    private fun getDataFromDb(){
+        this.launch {
+            this.let {
+                var cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getAllCategory()
+                arrMainCategory = cat as ArrayList<CategoryItems>
+                arrMainCategory.reverse()
+
+                getMealDataFromDb(arrMainCategory[0].strcategory)
+                mainCategoryAdapter.setData(arrMainCategory)
+                val rvMainCategory = findViewById<RecyclerView>(R.id.rv_main_category)
+                rvMainCategory.layoutManager = LinearLayoutManager(this@HomeActivity, LinearLayoutManager.HORIZONTAL, false)//HORIZONTAL表示子项将水平排列，false表示从左向右排列
+                rvMainCategory.adapter = mainCategoryAdapter
+            }
+        }
+    }
+
+    private fun getMealDataFromDb(categoryName:String){
+        val tvCategory = findViewById<TextView>(R.id.tvCategory)
+
+        tvCategory.text = "$categoryName Category"
+        launch {
+            this.let {
+                var cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getSpecificMealList(categoryName)
+                arrSubCategory = cat as ArrayList<MealsItems>
+                subCategoryAdapter.setData(arrSubCategory)
+
+                val rv_sub_category = findViewById<RecyclerView>(R.id.rv_sub_category)
+
+                rv_sub_category.layoutManager = LinearLayoutManager(this@HomeActivity,LinearLayoutManager.HORIZONTAL,false)
+                rv_sub_category.adapter = subCategoryAdapter
+            }
+
+
+        }
     }
 }

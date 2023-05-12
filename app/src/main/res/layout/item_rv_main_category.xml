@@ -27,7 +27,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginTop="-20dp"
                 android:layout_marginRight="-20dp"
-                android:src="@drawable/cat_img"/>
+                />
 
             <TextView
                 android:id="@+id/tv_dish_name"

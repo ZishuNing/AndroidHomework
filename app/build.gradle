@@ -54,13 +54,13 @@ dependencies {
     implementation 'pub.devrel:easypermissions:3.0.0'//简化运行权限申请
 
     //room database
-    implementation("androidx.room:room-runtime:2.5.0")
-    annotationProcessor("androidx.room:room-compiler:2.5.0")
-    kapt("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-runtime:2.5.1")
+    annotationProcessor("androidx.room:room-compiler:2.5.1")
+    kapt("androidx.room:room-compiler:2.5.1")
 
     implementation "androidx.recyclerview:recyclerview:1.1.0"//recyclerview
     implementation 'com.makeramen:roundedimageview:2.3.0'//圆角图片
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.1'//Kotlin 协程库
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'//Kotlin 协程库
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'//用于进行网络请求
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'//用于将 JSON 数据转换为 Java 对象或将 Java 对象转换为 JSON 数据

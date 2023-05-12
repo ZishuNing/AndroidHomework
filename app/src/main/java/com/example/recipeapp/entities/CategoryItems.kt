@@ -9,27 +9,26 @@ import com.google.gson.annotations.SerializedName
 //品类具体物品表
 @Entity(tableName = "CategoryItems")
 data class CategoryItems(
-    @PrimaryKey(autoGenerate = true)//autoGenerate ID自增
+    @PrimaryKey(autoGenerate = true)
     var id:Int,
-    //@Expose标记需要在JSON和对象之间互转的属性
-    //@SerializedName表示该属性在JSON序列化和反序列化时使用的名称
+
     @ColumnInfo(name = "idcategory")
     @Expose
     @SerializedName("idCategory")
-    val idcategory: String,//食品类别的ID
+    val idcategory: String,
 
     @ColumnInfo(name = "strcategory")
     @Expose
     @SerializedName("strCategory")
-    val strcategory: String,//食品类别的名称
+    val strcategory: String,
 
     @ColumnInfo(name = "strcategorythumb")
     @Expose
     @SerializedName("strCategoryThumb")
-    val strcategorythumb: String,//缩略图URL
+    val strcategorythumb: String,
 
     @ColumnInfo(name = "strcategorydescription")
     @Expose
     @SerializedName("strCategoryDescription")
-    val strcategorydescription: String//描述信息
+    val strcategorydescription: String
 )

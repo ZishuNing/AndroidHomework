@@ -10,7 +10,7 @@ import com.example.recipeapp.entities.*
 import com.example.recipeapp.entities.converter.CategoryListConverter
 
 //"exportSchema = false"指不导出数据库JSON结构文件
-@Database(entities = [Recipes::class,CategoryItems::class,Category::class],version=1, exportSchema = false)
+@Database(entities = [Recipes::class,CategoryItems::class,Category::class,Meal::class, MealsItems::class],version=1, exportSchema = false)
 abstract class RecipeDatabase:RoomDatabase() {
     // 声明需要使用CategoryListConverter进行类型转换，即在存储时，把List<CategoryItems>转换成JSON
     @TypeConverters(CategoryListConverter::class)
