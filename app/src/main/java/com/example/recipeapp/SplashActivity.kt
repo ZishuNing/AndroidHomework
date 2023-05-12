@@ -1,6 +1,7 @@
 package com.example.recipeapp
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -30,7 +31,12 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
-        readStorageTask()
+//        readStorageTask()
+
+
+        clearDatabase()
+        getCategories()
+
 
         val btnGetStarted=findViewById<Button>(R.id.btnGetStarted)
         //点击btnGetStarted转到HomeActivity
@@ -40,6 +46,13 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
             finish()
         }
     }
+
+
+
+
+
+
+
     //使用Retrofit获取类别列表
     fun getCategories() {
         //创建网络请求接口的实例
@@ -53,6 +66,7 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
             //在请求完成后回调onResponse()或onFailure()
             //请求失败
             override fun onFailure(call: Call<Category>, t: Throwable) {
+                Log.d("MainActivity", "onFailure: " + t.message)
                 Toast.makeText(this@SplashActivity, "Something went wrong", Toast.LENGTH_SHORT)
                     .show()
             }
@@ -162,14 +176,9 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
         }
     }
 
-
-
-
-
-
-
-
-
+    private  fun hasReadStoragePermission(): Boolean{
+        return EasyPermissions.hasPermissions(this,android.Manifest.permission.READ_EXTERNAL_STORAGE)
+    }
 
 
     private fun readStorageTask(){
@@ -206,15 +215,15 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
 
 
 
-    private  fun hasReadStoragePermission(): Boolean{
-        return EasyPermissions.hasPermissions(this,android.Manifest.permission.READ_EXTERNAL_STORAGE)
-    }
+
 
     override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-
+        clearDatabase()
+        getCategories()
     }
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
+        Log.d("MainActivity","Permission has been denied")
         if(EasyPermissions.somePermissionPermanentlyDenied(this, perms)){
             AppSettingsDialog.Builder(this).build().show()
         }

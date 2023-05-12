@@ -59,11 +59,16 @@ class HomeActivity : BaseActivity() {
 
 
     private fun getDataFromDb(){
-        this.launch {
+        launch {
             this.let {
+
                 var cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getAllCategory()
                 arrMainCategory = cat as ArrayList<CategoryItems>
                 arrMainCategory.reverse()
+
+
+
+
 
                 getMealDataFromDb(arrMainCategory[0].strcategory)
                 mainCategoryAdapter.setData(arrMainCategory)

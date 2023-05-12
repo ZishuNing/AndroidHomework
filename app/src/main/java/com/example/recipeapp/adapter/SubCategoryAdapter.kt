@@ -43,7 +43,8 @@ class SubCategoryAdapter: RecyclerView.Adapter<SubCategoryAdapter.RecipeViewHold
 
         tvDishName.text = arrSubCategory[position].strMeal
 
-        val img_dish = holder.itemView.findViewById<de.hdodenhof.circleimageview.CircleImageView>(R.id.img_dish)
+        // 正确的类型是AppCompatImageView，不是ImageView
+        val img_dish = holder.itemView.findViewById<androidx.appcompat.widget.AppCompatImageView>(R.id.img_dish)
 
         Glide.with(ctx!!).load(arrSubCategory[position].strMealThumb).into(img_dish)
 

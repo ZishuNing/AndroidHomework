@@ -27,7 +27,7 @@ abstract class RecipeDatabase:RoomDatabase() {
                     context,
                     RecipeDatabase::class.java,//数据库抽象类
                     "recipe.db"//数据库名称
-                ).build()
+                ).allowMainThreadQueries().build() // 允许主线程访问数据库，因为这个app只有协程没有多线程，不允许的话用不了
             }
             //第一次创建之后数据库一定存在，但编译器并不知道，会报错，需要用!!告诉编译器变量一定不为空
             return recipesDatabase!!

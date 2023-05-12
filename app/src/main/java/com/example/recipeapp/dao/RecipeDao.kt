@@ -13,7 +13,7 @@ import com.example.recipeapp.entities.Recipes
 @Dao
 interface RecipeDao {
     //查询所有菜品类别
-    @Query("SELECT * FROM categoryitems ORDER BY id DESC")
+    @Query("SELECT * FROM CategoryItems ORDER BY id DESC")
     suspend fun getAllCategory() :List<CategoryItems>
 
     //"OnConflictStrategy.REPLACE"表示如果要插入的数据已经存在，则先删除已有的数据，再插入新的数据
@@ -21,7 +21,7 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun  insertCategory(categoryItems: CategoryItems)
 
-    @Query("DELETE FROM categoryitems")
+    @Query("DELETE FROM CategoryItems")
     suspend fun clearDb()
 
 
@@ -29,6 +29,6 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMeal(mealsItems: MealsItems?)
 
-    @Query("SELECT * FROM MealItems WHERE categoryName =  :categorName ORDER BY id DESC")
-    suspend fun getSpecificMealList(categorName:String) :List<MealsItems>
+    @Query("SELECT * FROM MealItems WHERE categoryName =  :categoryName ORDER BY id DESC")
+    suspend fun getSpecificMealList(categoryName:String) :List<MealsItems>
 }
