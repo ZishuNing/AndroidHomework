@@ -33,7 +33,7 @@ class HomeActivity : BaseActivity() {
         getDataFromDb()
 
         mainCategoryAdapter.setClickListener(onCLicked)
-//        subCategoryAdapter.setClickListener(onCLickedSubItem)
+        subCategoryAdapter.setClickListener(onCLickedSubItem)
 
     }
 
@@ -44,14 +44,14 @@ class HomeActivity : BaseActivity() {
         }
     }
 
-    //  函数指针，点击之后执行onClicked函数
-//    private val onCLickedSubItem  = object : SubCategoryAdapter.OnItemClickListener{
-//        override fun onClicked(id: String) {
-//            var intent = Intent(this@HomeActivity,DetailActivity::class.java)
-//            intent.putExtra("id",id)
-//            startActivity(intent)
-//        }
-//    }
+    // 函数指针，点击之后执行onClicked函数, 传送到DetailActivity
+    private val onCLickedSubItem  = object : SubCategoryAdapter.OnItemClickListener{
+        override fun onClicked(id: String) {
+            var intent = Intent(this@HomeActivity,DetailActivity::class.java)
+            intent.putExtra("id",id)
+            startActivity(intent)
+        }
+    }
 
 
 

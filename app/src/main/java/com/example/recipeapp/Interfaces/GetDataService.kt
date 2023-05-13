@@ -2,6 +2,7 @@ package com.example.recipeapp.Interfaces
 
 import com.example.recipeapp.entities.Category
 import com.example.recipeapp.entities.Meal
+import com.example.recipeapp.entities.MealResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -16,4 +17,7 @@ interface GetDataService {
 
     @GET("filter.php")
     fun getMealList(@Query("c") category: String): retrofit2.Call<Meal>
+
+    @GET("lookup.php")
+    fun getSpecificItem(@Query("i") id: String): retrofit2.Call<MealResponse>
 }
