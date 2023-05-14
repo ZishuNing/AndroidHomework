@@ -29,6 +29,7 @@ interface RecipeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMeal(mealsItems: MealsItems?)
 
+    // 查询所有菜品
     @Query("SELECT * FROM MealItems WHERE categoryName =  :categoryName ORDER BY id DESC")
     suspend fun getSpecificMealList(categoryName:String) :List<MealsItems>
 }

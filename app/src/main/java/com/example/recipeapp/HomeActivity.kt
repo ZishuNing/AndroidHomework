@@ -61,14 +61,10 @@ class HomeActivity : BaseActivity() {
     private fun getDataFromDb(){
         launch {
             this.let {
-
+                // 获得所有的Category，并展示
                 var cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getAllCategory()
                 arrMainCategory = cat as ArrayList<CategoryItems>
                 arrMainCategory.reverse()
-
-
-
-
 
                 getMealDataFromDb(arrMainCategory[0].strcategory)
                 mainCategoryAdapter.setData(arrMainCategory)
@@ -85,6 +81,7 @@ class HomeActivity : BaseActivity() {
         tvCategory.text = "$categoryName Category"
         launch {
             this.let {
+                // 获得所有的MealData，并展示
                 var cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getSpecificMealList(categoryName)
                 arrSubCategory = cat as ArrayList<MealsItems>
                 subCategoryAdapter.setData(arrSubCategory)

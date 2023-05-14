@@ -32,7 +32,7 @@ class DetailActivity : BaseActivity() {
 
     var youtubeLink = ""
 
-    // 从HomeActivity传过来
+    // 从HomeActivity过来，展示具体的食物信息
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
@@ -81,6 +81,8 @@ class DetailActivity : BaseActivity() {
                 val tvCategory = findViewById<TextView>(R.id.tvCategory)
                 tvCategory.text = response.body()!!.mealsEntity[0].strmeal
 
+
+                // 写入内容
                 var ingredient = "${response.body()!!.mealsEntity[0].stringredient1}      ${response.body()!!.mealsEntity[0].strmeasure1}\n" +
                         "${response.body()!!.mealsEntity[0].stringredient2}      ${response.body()!!.mealsEntity[0].strmeasure2}\n" +
                         "${response.body()!!.mealsEntity[0].stringredient3}      ${response.body()!!.mealsEntity[0].strmeasure3}\n" +

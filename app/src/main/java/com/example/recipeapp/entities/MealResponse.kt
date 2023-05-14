@@ -3,13 +3,14 @@ package com.example.recipeapp.entities
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-
+// 一个MealResponse包含多个MealsEntity
 data class MealResponse(
     @Expose
     @SerializedName("meals")
     var mealsEntity: List<MealsEntity>
 )
 
+// 根据JSON格式，定义MealsEntity
 data class MealsEntity(
     @Expose
     @SerializedName("idMeal")

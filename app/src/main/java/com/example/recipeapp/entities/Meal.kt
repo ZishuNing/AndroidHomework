@@ -10,7 +10,7 @@ import com.google.gson.annotations.SerializedName
 
 // 菜品
 @Entity(tableName = "Meal")
-@TypeConverters(MealListConverter::class) // 声明需要使用MealListConverter进行类型转换，即在拿出来时，从JSON还原为List<MealsItems>，再官方手册上面，此注解需要写在这里，才能build成功
+@TypeConverters(MealListConverter::class) // 声明需要使用MealListConverter进行类型转换，即在拿出来时，从JSON还原为List<MealsItems>，官方手册上面说，此注解需要写在这里，才能build成功
 class Meal(
 
     @PrimaryKey(autoGenerate = true)

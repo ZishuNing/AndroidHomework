@@ -7,6 +7,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
 class MealListConverter {
+
+    // 将 List<MealsItems> 转换为JSON
     @TypeConverter
     fun fromCategoryList(category: List<MealsItems>?):String?{
         if (category == null){
@@ -20,6 +22,8 @@ class MealListConverter {
         }
     }
 
+
+    //将JSON转换为 List<MealsItems>
     @TypeConverter
     fun toCategoryList ( categoryString: String?):List<MealsItems>?{
         if (categoryString == null){

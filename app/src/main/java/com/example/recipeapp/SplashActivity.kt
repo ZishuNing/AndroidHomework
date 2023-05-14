@@ -33,12 +33,20 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
 
 //        readStorageTask()
 
+        // 在我的手机上，这个方法不起作用，所以我注释掉了
 
+        // 直接清楚数据库，然后重新获取数据
         clearDatabase()
         getCategories()
 
 
-        val btnGetStarted=findViewById<Button>(R.id.btnGetStarted)
+        // 隐藏加载动画
+        val loader = findViewById<ProgressBar>(R.id.loader)
+        loader.visibility = View.INVISIBLE
+
+        // 显示开始按钮
+        val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
+        btnGetStarted.visibility = View.VISIBLE
         //点击btnGetStarted转到HomeActivity
         btnGetStarted.setOnClickListener {
             val intent=Intent(this,HomeActivity::class.java)
@@ -83,6 +91,8 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
 
 
                 insertDataIntoRoomDb( response.body())
+
+
             }
         })
     }
@@ -108,6 +118,8 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
             ) {
 
                 insertMealDataIntoRoomDb(categoryName, response.body())
+
+
             }
 
         })
@@ -132,9 +144,7 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
                     Log.d("mealData", arr.toString())
                 }
 
-                val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
 
-                btnGetStarted.visibility = View.VISIBLE
             }
         }
 
@@ -182,6 +192,7 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
 
 
     private fun readStorageTask(){
+        // 我的手机安卓版本一开始就有权限，所以不需要这个方法
         if(hasReadStoragePermission()){
             clearDatabase()
             getCategories()
