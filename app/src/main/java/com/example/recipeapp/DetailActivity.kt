@@ -1,16 +1,14 @@
 package com.example.recipeapp
 
 
+import android.content.ContentValues
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Toast
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import com.bumptech.glide.Glide
 import com.example.recipeapp.Interfaces.GetDataService
 import com.example.recipeapp.database.RecipeDatabase
@@ -31,15 +29,17 @@ import retrofit2.Response
 class DetailActivity : BaseActivity() {
 
     var youtubeLink = ""
-
+    var myid : String? = null
+    var favCursor : Cursor? = null
     // 从HomeActivity过来，展示具体的食物信息
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        var id = intent.getStringExtra("id")
+        myid = intent.getStringExtra("id")
 
-        getSpecificItem(id!!)
+        getSpecificItem(myid!!)
+
 
 
 
@@ -56,12 +56,49 @@ class DetailActivity : BaseActivity() {
             startActivity(intent)
         }
 
+        val favourite = findViewById<ImageButton>(R.id.imgToolbarBtnFav)
+        favourite.setOnClickListener{
+
+
+
+            // 不喜欢的情况
+            if(favCursor == null){
+                // 改成喜欢
+                var contentvalues = ContentValues()
+                contentvalues.put("id", myid)
+                contentResolver.insert(Uri.parse("content://com.example.recipeapp.provider/favourite"), contentvalues)
+                favCursor =  contentResolver.query(Uri.parse("content://com.example.recipeapp.provider/favourite/$myid"), null, null, null, null)
+                if(favCursor==null){
+                    Toast.makeText(this, "provider insert wrong", Toast.LENGTH_SHORT).show()
+                }
+            }else{
+                contentResolver.delete(Uri.parse("content://com.example.recipeapp.provider/favourite/$myid"), null, null)
+                favCursor = null
+            }
+            setFavourite()
+
+        }
+
+    }
+
+    // 查看是否被喜欢了
+    fun setFavourite(){
+        val favourite = findViewById<ImageButton>(R.id.imgToolbarBtnFav)
+        // 不喜欢
+        if(favCursor==null){
+            favourite.setBackgroundResource(R.drawable.btn_bg2)
+        }else{
+            // 喜欢
+            favourite.setBackgroundResource(R.drawable.btn_bg2r)
+        }
     }
 
     fun getSpecificItem(id:String) {
         // 获取网络获取数据的单例
+        myid = id
         val service = RetrofitClientInstance.retrofitInstance!!.create(GetDataService::class.java)
         val call = service.getSpecificItem(id)
+
         // 通过id获取数据
         call.enqueue(object : Callback<MealResponse> {
             override fun onFailure(call: Call<MealResponse>, t: Throwable) {
@@ -116,6 +153,9 @@ class DetailActivity : BaseActivity() {
                     val btnYoutube = findViewById<Button>(R.id.btnYoutube)
                     btnYoutube.visibility = View.GONE
                 }
+
+                favCursor = contentResolver.query(Uri.parse("content://com.example.recipeapp.provider/favourite/${myid}"), null, null, null, null)
+                setFavourite()
             }
 
         })

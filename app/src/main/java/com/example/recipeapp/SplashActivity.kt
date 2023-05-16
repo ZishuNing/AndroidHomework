@@ -35,24 +35,19 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
 
         // 在我的手机上，这个方法不起作用，所以我注释掉了
 
-        // 直接清楚数据库，然后重新获取数据
+        // 直接清除数据库，然后重新获取数据
         clearDatabase()
         getCategories()
 
-
-        // 隐藏加载动画
-        val loader = findViewById<ProgressBar>(R.id.loader)
-        loader.visibility = View.INVISIBLE
-
-        // 显示开始按钮
         val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
-        btnGetStarted.visibility = View.VISIBLE
+
         //点击btnGetStarted转到HomeActivity
         btnGetStarted.setOnClickListener {
             val intent=Intent(this,HomeActivity::class.java)
             startActivity(intent)
             finish()
         }
+
     }
 
 
@@ -91,6 +86,14 @@ class SplashActivity : BaseActivity() ,EasyPermissions.PermissionCallbacks, Easy
 
 
                 insertDataIntoRoomDb( response.body())
+                // 隐藏加载动画
+                val loader = findViewById<ProgressBar>(R.id.loader)
+                loader.visibility = View.INVISIBLE
+
+                // 显示开始按钮
+                val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
+                btnGetStarted.visibility = View.VISIBLE
+
 
 
             }

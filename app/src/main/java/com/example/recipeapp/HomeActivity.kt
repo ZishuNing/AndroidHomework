@@ -35,6 +35,8 @@ class HomeActivity : BaseActivity() {
         mainCategoryAdapter.setClickListener(onCLicked)
         subCategoryAdapter.setClickListener(onCLickedSubItem)
 
+
+
     }
 
     // 函数指针，点击之后执行onClicked函数
