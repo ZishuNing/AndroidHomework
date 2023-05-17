@@ -57,14 +57,7 @@ class DetailActivity : BaseActivity() {
                 }
             })
 
-//            if(meal != null){
-//                showDetail(meal)
-//                Log.d("DetailActivity", "onServiceConnected: 从缓存中获取数据")
-//
-//            }else{
-//                Log.d("DetailActivity", "onServiceConnected: 从网络中获取数据")
-////                getSpecificItem(myid!!)
-//            }
+
         }
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.d("DetailActivity", "onServiceDisconnected: ")

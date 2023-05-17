@@ -1,9 +1,13 @@
 package com.example.recipeapp
 
 import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.Intent
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
+import android.os.IBinder
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageView
@@ -40,28 +44,48 @@ class HomeActivity : BaseActivity() {
 
     var favs : ArrayList<MealsItems> = ArrayList()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
 
         getDataFromDb()
-        getDataFromProvider()
+
 
         mainCategoryAdapter.setClickListener(onCLicked)
         subCategoryAdapter.setClickListener(onCLickedSubItem)
-        favCategoryAdapter.setClickListener(onCLickedFavItem)
+        startService(Intent(this@HomeActivity,CacheService::class.java)) // 启动服务
+        // 绑定服务，从服务里面获取数据，或从网络里面获取数据并缓存起来
+        val intent = Intent(this, CacheService::class.java)
+        bindService(intent, connection, BIND_AUTO_CREATE)
 
 
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(connection)// 解绑，因为服务是在HomeActivity里面启动的，所以在这里解绑，不会使它消失，除非调用stopService
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        favs.clear()
+        // 当从其他界面返回的时候，重新获取favourite
+        if(connection.binder != null){
+            getDataFromProvider()
+            favCategoryAdapter.setClickListener(onCLickedFavItem)
+        }
+
+    }
 
     private fun getDataFromProvider() {
         // 获取所有favourite
         val fav_cursor = contentResolver.query(Uri.parse("content://com.example.recipeapp.provider/favourite") ,null,null,null,null)
 
 
-        var meals = ArrayList<String>()
+        val meals = ArrayList<String>()
 
 
         fav_cursor?.moveToFirst()
@@ -80,7 +104,7 @@ class HomeActivity : BaseActivity() {
             fav_cursor.close()
         }
 
-        getSpecificItem(meals)
+        getItems(meals)
 
 
 
@@ -89,9 +113,26 @@ class HomeActivity : BaseActivity() {
         rv_fav_category.layoutManager = LinearLayoutManager(this@HomeActivity,LinearLayoutManager.HORIZONTAL,false)
         rv_fav_category.adapter = favCategoryAdapter
 
-
-        startService(Intent(this@HomeActivity,CacheService::class.java)) // 启动服务
     }
+
+    // 使用Service获取数据
+    fun getItems(meals:ArrayList<String>) {
+
+
+        for(i in meals.indices){
+            val meal = connection.binder!!.getCache(meals[i], object : CacheService.CacheCallback{
+                override fun onCacheGet(meal: MealsEntity) {
+                    // 小型meal
+                    show(meal)
+
+                }
+            })
+
+        }
+
+    }
+
+
 
     // 函数指针，点击之后执行onClicked函数
     private val onCLicked  = object : MainCategoryAdapter.OnItemClickListener{
@@ -119,50 +160,41 @@ class HomeActivity : BaseActivity() {
     }
 
 
+    fun show(enti: MealsEntity){
 
-     fun getSpecificItem(meals:ArrayList<String>) {
-        // 获取网络获取数据的MealsEntity
-        val service = RetrofitClientInstance.retrofitInstance!!.create(GetDataService::class.java)
+        val meal = MealsItems(
+            favs.size,
+            enti.idmeal,
+            enti.strcategory,
+            enti.strmeal,
+            enti.strmealthumb
+        )
+        favs.add(meal)
+        favCategoryAdapter.setData(favs)
+        val rv_fav_category = findViewById<RecyclerView>(R.id.rv_fav_category)
 
-         for(i in meals.indices){
-             val call = service.getSpecificItem(meals[i])
-             call.enqueue(object : Callback<MealResponse> {
-
-                 override fun onFailure(call: Call<MealResponse>, t: Throwable) {
-
-                     Toast.makeText(this@HomeActivity, "Something went wrong" + t.message, Toast.LENGTH_SHORT )
-                         .show()
-                 }
-
-                 override fun onResponse(
-                     call: Call<MealResponse>,
-                     response: Response<MealResponse>
-                 ) {
-                    // 只能这样做了，要想获取图片，网络获取到一个就加入一个
-                     val enti = response.body()!!.mealsEntity[0]
-                        val meal = MealsItems(
-                            favs.size,
-                            enti.idmeal,
-                            enti.strcategory,
-                            enti.strmeal,
-                            enti.strmealthumb
-                        )
-                     favs.add(meal)
-                     favCategoryAdapter.setData(favs)
-                     val rv_fav_category = findViewById<RecyclerView>(R.id.rv_fav_category)
-
-                     rv_fav_category.layoutManager = LinearLayoutManager(this@HomeActivity,LinearLayoutManager.HORIZONTAL,false)
-                     rv_fav_category.adapter = favCategoryAdapter
-                 }
-
-             })
-         }
-
-
-
-
-
+        rv_fav_category.layoutManager = LinearLayoutManager(this@HomeActivity,LinearLayoutManager.HORIZONTAL,false)
+        rv_fav_category.adapter = favCategoryAdapter
     }
+
+
+
+    private val connection = object : ServiceConnection {
+
+        var binder : CacheService.CacheBinder ?= null
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            binder = service as CacheService.CacheBinder
+            getDataFromProvider()
+            favCategoryAdapter.setClickListener(onCLickedFavItem)
+        }
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d("HomeActivity", "onServiceDisconnected: ")
+        }
+    }
+
+
+
+
 
 
     private fun getDataFromDb(){
