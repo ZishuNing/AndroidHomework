@@ -89,6 +89,8 @@ class HomeActivity : BaseActivity() {
         rv_fav_category.layoutManager = LinearLayoutManager(this@HomeActivity,LinearLayoutManager.HORIZONTAL,false)
         rv_fav_category.adapter = favCategoryAdapter
 
+
+        startService(Intent(this@HomeActivity,CacheService::class.java)) // 启动服务
     }
 
     // 函数指针，点击之后执行onClicked函数

@@ -1,21 +1,24 @@
 package com.example.recipeapp
 
 
+import android.annotation.SuppressLint
+import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Intent
+import android.content.ServiceConnection
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.IBinder
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.example.recipeapp.Interfaces.GetDataService
 import com.example.recipeapp.database.RecipeDatabase
-import com.example.recipeapp.entities.Category
-import com.example.recipeapp.entities.Meal
-import com.example.recipeapp.entities.MealResponse
-import com.example.recipeapp.entities.MealsItems
+import com.example.recipeapp.entities.*
 import com.example.recipeapp.retrofitclient.RetrofitClientInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -26,11 +29,51 @@ import retrofit2.Callback
 import retrofit2.Response
 
 //Meal界面
+@SuppressLint("HandlerLeak")
 class DetailActivity : BaseActivity() {
 
     var youtubeLink = ""
     var myid : String? = null
     var favCursor : Cursor? = null
+    var binder : CacheService.CacheBinder? = null
+
+
+
+//    val show = 1
+//
+//    var handler = object : Handler(Looper.getMainLooper()){
+//        override fun handleMessage(msg: android.os.Message) {
+//            super.handleMessage(msg)
+//            when(msg.what){
+//                show -> {
+//                    val meal = msg.obj as MealsEntity
+//                    showDetail(meal)
+//                }
+//            }
+//        }
+//    }
+
+    private val connection = object :ServiceConnection{
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            binder = service as CacheService.CacheBinder
+
+            val meal =binder!!.getCache(myid!!)
+            if(meal != null){
+                showDetail(meal)
+                Log.d("DetailActivity", "onServiceConnected: 从缓存中获取数据")
+
+            }else{
+                Log.d("DetailActivity", "onServiceConnected: 从网络中获取数据")
+                getSpecificItem(myid!!)
+            }
+        }
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Log.d("DetailActivity", "onServiceDisconnected: ")
+        }
+    }
+
+
+
     // 从HomeActivity过来，展示具体的食物信息
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +81,11 @@ class DetailActivity : BaseActivity() {
 
         myid = intent.getStringExtra("id")
 
-        getSpecificItem(myid!!)
+
+
+        // 绑定服务，从服务里面获取数据，或从网络里面获取数据并缓存起来
+        val intent = Intent(this, CacheService::class.java)
+        bindService(intent, connection, BIND_AUTO_CREATE)
 
 
 
@@ -81,6 +128,12 @@ class DetailActivity : BaseActivity() {
 
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(connection)// 解绑，因为服务是在HomeActivity里面启动的，所以在这里解绑，不会使它消失，除非调用stopService
+    }
+
     // 查看是否被喜欢了
     fun setFavourite(){
         val favourite = findViewById<ImageButton>(R.id.imgToolbarBtnFav)
@@ -93,8 +146,58 @@ class DetailActivity : BaseActivity() {
         }
     }
 
+
+    fun showDetail(meal: MealsEntity) {
+        val imgItem = findViewById<ImageView>(R.id.imgItem)
+        Glide.with(this@DetailActivity).load(meal.strmealthumb).into(imgItem)
+
+        val tvCategory = findViewById<TextView>(R.id.tvCategory)
+        tvCategory.text = meal.strmeal
+
+
+        // 写入内容
+        var ingredient = "${meal.stringredient1}      ${meal.strmeasure1}\n" +
+                "${meal.stringredient2}      ${meal.strmeasure2}\n" +
+                "${meal.stringredient3}      ${meal.strmeasure3}\n" +
+                "${meal.stringredient4}      ${meal.strmeasure4}\n" +
+                "${meal.stringredient5}      ${meal.strmeasure5}\n" +
+                "${meal.stringredient6}      ${meal.strmeasure6}\n" +
+                "${meal.stringredient7}      ${meal.strmeasure7}\n" +
+                "${meal.stringredient8}      ${meal.strmeasure8}\n" +
+                "${meal.stringredient9}      ${meal.strmeasure9}\n" +
+                "${meal.stringredient10}      ${meal.strmeasure10}\n" +
+                "${meal.stringredient11}      ${meal.strmeasure11}\n" +
+                "${meal.stringredient12}      ${meal.strmeasure12}\n" +
+                "${meal.stringredient13}      ${meal.strmeasure13}\n" +
+                "${meal.stringredient14}      ${meal.strmeasure14}\n" +
+                "${meal.stringredient15}      ${meal.strmeasure15}\n" +
+                "${meal.stringredient16}      ${meal.strmeasure16}\n" +
+                "${meal.stringredient17}      ${meal.strmeasure17}\n" +
+                "${meal.stringredient18}      ${meal.strmeasure18}\n" +
+                "${meal.stringredient19}      ${meal.strmeasure19}\n" +
+                "${meal.stringredient20}      ${meal.strmeasure20}\n"
+
+        val tvIngredients = findViewById<TextView>(R.id.tvIngredients)
+        tvIngredients.text = ingredient
+
+        val tvInstructions = findViewById<TextView>(R.id.tvInstructions)
+        tvInstructions.text = meal.strinstructions
+
+        if (meal.strsource != null){
+            youtubeLink = meal.strsource
+        }else{
+            val btnYoutube = findViewById<Button>(R.id.btnYoutube)
+            btnYoutube.visibility = View.GONE
+        }
+
+        favCursor = contentResolver.query(Uri.parse("content://com.example.recipeapp.provider/favourite/${myid}"), null, null, null, null)
+        setFavourite()
+    }
     fun getSpecificItem(id:String) {
-        // 获取网络获取数据的单例
+        // 获取网络或缓存服务获取数据的单例
+
+
+
         myid = id
         val service = RetrofitClientInstance.retrofitInstance!!.create(GetDataService::class.java)
         val call = service.getSpecificItem(id)
@@ -112,54 +215,14 @@ class DetailActivity : BaseActivity() {
                 response: Response<MealResponse>
             ) {
 
-                val imgItem = findViewById<ImageView>(R.id.imgItem)
-                Glide.with(this@DetailActivity).load(response.body()!!.mealsEntity[0].strmealthumb).into(imgItem)
+                showDetail(response.body()!!.mealsEntity[0])
+                binder!!.setCache(id, response.body()!!.mealsEntity[0])
 
-                val tvCategory = findViewById<TextView>(R.id.tvCategory)
-                tvCategory.text = response.body()!!.mealsEntity[0].strmeal
-
-
-                // 写入内容
-                var ingredient = "${response.body()!!.mealsEntity[0].stringredient1}      ${response.body()!!.mealsEntity[0].strmeasure1}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient2}      ${response.body()!!.mealsEntity[0].strmeasure2}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient3}      ${response.body()!!.mealsEntity[0].strmeasure3}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient4}      ${response.body()!!.mealsEntity[0].strmeasure4}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient5}      ${response.body()!!.mealsEntity[0].strmeasure5}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient6}      ${response.body()!!.mealsEntity[0].strmeasure6}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient7}      ${response.body()!!.mealsEntity[0].strmeasure7}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient8}      ${response.body()!!.mealsEntity[0].strmeasure8}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient9}      ${response.body()!!.mealsEntity[0].strmeasure9}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient10}      ${response.body()!!.mealsEntity[0].strmeasure10}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient11}      ${response.body()!!.mealsEntity[0].strmeasure11}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient12}      ${response.body()!!.mealsEntity[0].strmeasure12}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient13}      ${response.body()!!.mealsEntity[0].strmeasure13}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient14}      ${response.body()!!.mealsEntity[0].strmeasure14}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient15}      ${response.body()!!.mealsEntity[0].strmeasure15}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient16}      ${response.body()!!.mealsEntity[0].strmeasure16}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient17}      ${response.body()!!.mealsEntity[0].strmeasure17}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient18}      ${response.body()!!.mealsEntity[0].strmeasure18}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient19}      ${response.body()!!.mealsEntity[0].strmeasure19}\n" +
-                        "${response.body()!!.mealsEntity[0].stringredient20}      ${response.body()!!.mealsEntity[0].strmeasure20}\n"
-
-                val tvIngredients = findViewById<TextView>(R.id.tvIngredients)
-                tvIngredients.text = ingredient
-
-                val tvInstructions = findViewById<TextView>(R.id.tvInstructions)
-                tvInstructions.text = response.body()!!.mealsEntity[0].strinstructions
-
-                if (response.body()!!.mealsEntity[0].strsource != null){
-                    youtubeLink = response.body()!!.mealsEntity[0].strsource
-                }else{
-                    val btnYoutube = findViewById<Button>(R.id.btnYoutube)
-                    btnYoutube.visibility = View.GONE
-                }
-
-                favCursor = contentResolver.query(Uri.parse("content://com.example.recipeapp.provider/favourite/${myid}"), null, null, null, null)
-                setFavourite()
             }
 
         })
     }
+
 
 
 }
