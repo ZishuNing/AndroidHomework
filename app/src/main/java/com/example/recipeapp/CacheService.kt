@@ -25,6 +25,7 @@ class Downloader(val id :String, val hm: HashMap<String, MealsEntity>) : Runnabl
         val service = RetrofitClientInstance.retrofitInstance!!.create(GetDataService::class.java)
         val call = service.getSpecificItem(id)
 
+        Thread.sleep(3000)
         // 通过id获取数据
         call.enqueue(object : Callback<MealResponse> {
             override fun onFailure(call: Call<MealResponse>, t: Throwable) {
@@ -36,7 +37,7 @@ class Downloader(val id :String, val hm: HashMap<String, MealsEntity>) : Runnabl
                 response: Response<MealResponse>
             ) {
 
-
+                Log.d("CacheService", "Downloader: $id")
                 synchronized(hm){
                     hm[id] = response.body()!!.mealsEntity[0]
                 }
@@ -123,10 +124,11 @@ class CacheService : Service() {
 
         fun makeCache(idMeals: List<String>){
             if(theradPool == null){
-                theradPool = Executors.newFixedThreadPool(CPU_COUNT)
+                theradPool = Executors.newFixedThreadPool(2)
             }else{
                 theradPool!!.shutdown()// 先关闭线程池
-                theradPool = Executors.newFixedThreadPool(CPU_COUNT)
+                theradPool = Executors.newFixedThreadPool(2)
+                Log.d("CacheService", "makeCache: shutdown new size: ${idMeals.size}")
             }
 
             for(idMeal in idMeals){

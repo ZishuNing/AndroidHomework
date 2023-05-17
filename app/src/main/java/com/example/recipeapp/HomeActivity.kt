@@ -221,7 +221,7 @@ class HomeActivity : BaseActivity() {
         launch {
             this.let {
                 // 获得所有的MealData，并展示
-                var cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getSpecificMealList(categoryName)
+                val cat = RecipeDatabase.getDatabase(this@HomeActivity).recipeDao().getSpecificMealList(categoryName)
                 arrSubCategory = cat as ArrayList<MealsItems>
                 subCategoryAdapter.setData(arrSubCategory)
 
@@ -229,6 +229,17 @@ class HomeActivity : BaseActivity() {
 
                 rv_sub_category.layoutManager = LinearLayoutManager(this@HomeActivity,LinearLayoutManager.HORIZONTAL,false)
                 rv_sub_category.adapter = subCategoryAdapter
+
+                while(connection.binder == null){
+                    yield() // 这里就可以yield了，因为是在子协程里面
+                }
+
+                val ids = ArrayList<String>()
+                for(i in arrSubCategory.indices){
+                    ids.add(arrSubCategory[i].idMeal)
+                }
+
+                connection.binder!!.makeCache(ids)
             }
 
 
