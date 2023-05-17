@@ -9,21 +9,14 @@ import android.content.ServiceConnection
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.os.IBinder
-import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.*
 import com.bumptech.glide.Glide
 import com.example.recipeapp.Interfaces.GetDataService
-import com.example.recipeapp.database.RecipeDatabase
 import com.example.recipeapp.entities.*
 import com.example.recipeapp.retrofitclient.RetrofitClientInstance
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import pub.devrel.easypermissions.AppSettingsDialog
-import pub.devrel.easypermissions.EasyPermissions
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -57,15 +50,21 @@ class DetailActivity : BaseActivity() {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
             binder = service as CacheService.CacheBinder
 
-            val meal =binder!!.getCache(myid!!)
-            if(meal != null){
-                showDetail(meal)
-                Log.d("DetailActivity", "onServiceConnected: 从缓存中获取数据")
 
-            }else{
-                Log.d("DetailActivity", "onServiceConnected: 从网络中获取数据")
-                getSpecificItem(myid!!)
-            }
+            val meal =binder!!.getCache(myid!!,object : CacheService.CacheCallback{
+                override fun onCacheGet(meal: MealsEntity) {
+                    showDetail(meal)
+                }
+            })
+
+//            if(meal != null){
+//                showDetail(meal)
+//                Log.d("DetailActivity", "onServiceConnected: 从缓存中获取数据")
+//
+//            }else{
+//                Log.d("DetailActivity", "onServiceConnected: 从网络中获取数据")
+////                getSpecificItem(myid!!)
+//            }
         }
         override fun onServiceDisconnected(name: ComponentName?) {
             Log.d("DetailActivity", "onServiceDisconnected: ")
