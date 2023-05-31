@@ -1,6 +1,5 @@
 package com.example.recipeapp
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -8,27 +7,21 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
-import android.view.View
 import android.widget.Button
-import android.widget.ImageView
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.recipeapp.Interfaces.GetDataService
 import com.example.recipeapp.adapter.FavouriteAdapter
 import com.example.recipeapp.adapter.MainCategoryAdapter
 import com.example.recipeapp.adapter.SubCategoryAdapter
 import com.example.recipeapp.database.RecipeDatabase
-import com.example.recipeapp.entities.*
-import com.example.recipeapp.retrofitclient.RetrofitClientInstance
-import kotlinx.coroutines.delay
+import com.example.recipeapp.entities.CategoryItems
+import com.example.recipeapp.entities.MealsEntity
+import com.example.recipeapp.entities.MealsItems
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 //主界面
 class HomeActivity : BaseActivity() {
@@ -49,9 +42,7 @@ class HomeActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-
         getDataFromDb()
-
 
         mainCategoryAdapter.setClickListener(onCLicked)
         subCategoryAdapter.setClickListener(onCLickedSubItem)
@@ -59,8 +50,16 @@ class HomeActivity : BaseActivity() {
         // 绑定服务，从服务里面获取数据，或从网络里面获取数据并缓存起来
         val intent = Intent(this, CacheService::class.java)
         bindService(intent, connection, BIND_AUTO_CREATE)
-
-
+        val btnProfile = findViewById<Button>(R.id.btn_profile)
+        btnProfile.setOnClickListener {
+            // 向控制台输出日志
+            Log.d("ahduabdj", "Button clicked")
+            // 显示 Toast 消息
+            Toast.makeText(this, "Button clicked", Toast.LENGTH_SHORT).show()
+            // 启动 ProfileActivity
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onDestroy() {
