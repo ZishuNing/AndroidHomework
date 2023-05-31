@@ -55,16 +55,6 @@
                 app:cardElevation="@dimen/_10sdp">
 
 
-                <SearchView
-                    android:id="@+id/search_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/search_bg"
-                    android:iconifiedByDefault="false"
-                    android:queryBackground="@color/transparent"
-                    android:queryHint="搜索菜谱"
-                    android:theme="@style/ThemeOverlay.Search" />
-
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
